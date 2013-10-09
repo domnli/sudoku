@@ -28,7 +28,26 @@ sudoku = function(io){
 		if(sudokulogic.initDate.length == 0){
 			sudokulogic.generateInitDate();
 		}
-		...
+		var I = sudokulogic.initDate;
+		var grid2res = grid2.res.y;
+		var fontSize = Math.floor(grid2res * 0.8);
+		for(var i = 0 ; i < I.length ; i++){
+			if(I[i] !== 0){
+				var x = i % 9,
+					y = Math.floor(i / 9);
+				var pos = grid2.getCellCenter(x,y);
+				//number bg
+				io.addObj(new iio.SimpleRect(pos,grid2res - 5)
+                               .setFillStyle('silver'));
+				//number
+				pos.y = pos.y + Math.floor(grid2res * 0.2);
+				io.addObj(new iio.Text(I[i],pos)
+				    .setFont(fontSize+'px Consolas')
+				    .setTextAlign('center')
+				    .setFillStyle('#000000'));
+				
+			}
+		}
 	})();
 
 	// resize
@@ -41,7 +60,15 @@ sudokulogic = {
 	redPos:[],
 	level:0,
 	generateInitDate:function(){
-
+		this.initDate = [0,1,0,0,0,0,0,0,0,
+						 2,0,0,0,0,0,0,0,0,
+						 0,0,6,0,0,0,0,0,0,
+						 0,0,0,0,0,0,0,0,0,
+						 0,0,0,0,0,0,0,0,0,
+						 0,0,0,0,0,0,5,0,0,
+						 0,0,0,0,8,0,0,0,0,
+						 0,0,0,0,0,0,0,0,0,
+						 0,0,0,0,0,0,0,5,0];
 	},
 	checkRepeat:function(){
 
