@@ -30,16 +30,19 @@ sudoku = function(io){
 		var grid2res = grid2.res.y;
 		var fontSize = Math.floor(grid2res * 0.8);
 		pos.y = pos.y + Math.floor(grid2res * 0.2);
-		//调试中
 		console.log(currentCell.pos.y);
+		
 		if(typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined'){
-			io.rmvObj(grid2.cells[coor.x][coor.y].numObj);
-		}
-		grid2.cells[coor.x][coor.y].numObj = new iio.Text(num,pos)
+			grid2.cells[coor.x][coor.y].numObj.setText(num);
+			io.draw();
+		}else{
+			grid2.cells[coor.x][coor.y].numObj = new iio.Text(num,pos)
 													    .setFont(fontSize+'px Consolas')
 													    .setTextAlign('center')
 													    .setFillStyle('#000000');
-		io.addObj(grid2.cells[coor.x][coor.y].numObj);
+			io.addObj(grid2.cells[coor.x][coor.y].numObj);
+		}
+		
 	};
 	var changeEditPos = function(pos){
 		if(!iio.intersects(bg,currentCell)){
