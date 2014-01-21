@@ -16,7 +16,7 @@ sudoku = function(io){
 	io.addObj(bg.setFillStyle('white'));
 	//three layer
 	var grid = new iio.Grid(ltx,lty,27,27,sideLength / 27);
-	io.addObj(grid.setStrokeStyle('silver',0.3));
+	//io.addObj(grid.setStrokeStyle('silver',0.3));
 
 	var grid2 = new iio.Grid(ltx,lty,9,9,sideLength / 9);
 	io.addObj(grid2.setStrokeStyle('gray',1));
@@ -27,20 +27,77 @@ sudoku = function(io){
 	var drawNumber = function(num){
 		var pos = currentCell.pos.clone();
 		var coor = grid2.getCellAt(pos);
-		var grid2res = grid2.res.y;
-		var fontSize = Math.floor(grid2res * 0.8);
-		pos.y = pos.y + Math.floor(grid2res * 0.2);
-		console.log(currentCell.pos.y);
-		
-		if(typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined'){
-			grid2.cells[coor.x][coor.y].numObj.setText(num);
-			io.draw();
+		var currentGrid;
+		//判断是否草稿模式
+		if(editMode == 0){
+			currentGrid = grid2;
+			pos.y = pos.y + Math.floor(currentGrid.res.y * 0.2);
 		}else{
-			grid2.cells[coor.x][coor.y].numObj = new iio.Text(num,pos)
+			currentGrid = grid;
+			pos.x = pos.x - currentGrid.res.x;
+			pos.y = pos.y - currentGrid.res.y;
+			switch(num){
+				case '1':
+				case '2':
+				case '3':
+					pos.x = pos.x + currentGrid.res.x * (num - 1);
+					break;
+				case '4':
+				case '5':
+				case '6':
+					pos.x = pos.x + currentGrid.res.x * (num - 4);
+					pos.y = pos.y + currentGrid.res.y;
+					break;
+				case '7':
+				case '8':
+				case '9':
+					pos.x = pos.x + currentGrid.res.x * (num - 7);
+					pos.y = pos.y + currentGrid.res.y * 2;
+					break;
+			}
+			pos.y = pos.y + Math.floor(currentGrid.res.y * 0.2);
+		}
+		var fontSize = Math.floor(currentGrid.res.y * 0.8);
+		var hideEditNum = function(){
+			var loop = grid2.cells[coor.x][coor.y].editNumObj;
+			if(typeof(loop) != 'undefined'){
+				for (var i = 0; i < loop.length; i++) {
+					loop[i].setFillStyle('#FFFFFF');
+				};
+			}
+			io.draw();
+		}
+		if(editMode == 0){
+			hideEditNum();
+			if(typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined'){
+				grid2.cells[coor.x][coor.y].numObj.setText(num);
+				io.draw();
+			}else{
+				currentGrid.cells[coor.x][coor.y].numObj = new iio.Text(num,pos)
 													    .setFont(fontSize+'px Consolas')
 													    .setTextAlign('center')
 													    .setFillStyle('#000000');
-			io.addObj(grid2.cells[coor.x][coor.y].numObj);
+				io.addObj(currentGrid.cells[coor.x][coor.y].numObj);
+			}
+		}else{
+			if(typeof(grid2.cells[coor.x][coor.y].editNumObj) == 'undefined'){
+				grid2.cells[coor.x][coor.y].editNumObj = [];
+				grid2.cells[coor.x][coor.y].editNumObj[num-1] = new iio.Text(num,pos)
+													    .setFont(fontSize+'px Consolas')
+													    .setTextAlign('center')
+													    .setFillStyle('#000000');
+				io.addObj(grid2.cells[coor.x][coor.y].editNumObj[num-1]);
+			}else if(typeof(grid2.cells[coor.x][coor.y].editNumObj[num-1]) == 'undefined'){
+				grid2.cells[coor.x][coor.y].editNumObj[num-1] = new iio.Text(num,pos)
+													    .setFont(fontSize+'px Consolas')
+													    .setTextAlign('center')
+													    .setFillStyle('#000000');
+				io.addObj(grid2.cells[coor.x][coor.y].editNumObj[num-1]);
+			}else{
+				io.rmvObj(grid2.cells[coor.x][coor.y].editNumObj[num-1]);
+				grid2.cells[coor.x][coor.y].editNumObj[num-1] = undefined;
+				io.draw();
+			}
 		}
 		
 	};
@@ -86,7 +143,6 @@ sudoku = function(io){
 		
 	});
 	window.addEventListener('keypress',function(event){
-		console.log(iio.getKeyString(event));
 		if(iio.keyCodeIs('space',event)){
 			editMode = editMode == 0 ? 1 : 0;
 			return;
