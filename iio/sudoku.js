@@ -24,6 +24,17 @@ sudoku = function(io){
 	var grid3 = new iio.Grid(ltx,lty,3,3,sideLength / 3);
 	io.addObj(grid3.setStrokeStyle('black',3));
 
+	// HELP TEXT
+	var helpText1 = new iio.Text('Change Mode : Space',350,205)
+						    .setFont('20px Consolas')
+						    .setTextAlign('center')
+						    .setFillStyle('#00baff');
+	io.addObj(helpText1);
+	var helpText2 = new iio.Text('Clear : c (or CapS Lock + c)',400,245)
+						    .setFont('20px Consolas')
+						    .setTextAlign('center')
+						    .setFillStyle('#00baff');
+	io.addObj(helpText2);
 	var drawNumber = function(num){
 		if (!currentCell.canEdit) {
 			return;
@@ -125,7 +136,7 @@ sudoku = function(io){
 		if (!currentCell.canEdit) {
 			return;
 		}
-		
+
 		editMode = 1;
 		var pos = currentCell.pos.clone();
 		var coor = grid2.getCellAt(pos);
@@ -156,10 +167,7 @@ sudoku = function(io){
 	};
 	//draw init number
 	(function(){
-		if(sudokulogic.initData.length == 0){
-			sudokulogic.generateInitData();
-		}
-		var I = sudokulogic.initData;
+		var I = (sudokulogic.generateInitData())();
 		var grid2res = grid2.res.y;
 		var fontSize = Math.floor(grid2res * 0.8);
 		for(var i = 0 ; i < I.length ; i++){
@@ -223,19 +231,34 @@ sudoku = function(io){
 	};
 };
 sudokulogic = {
-	initData:[],
 	redPos:[],
 	level:0,
 	generateInitData:function(){
-		this.initData = [0,1,0,0,0,0,0,0,0,
-						 2,0,0,0,0,0,0,0,0,
-						 0,0,6,0,0,0,0,0,0,
-						 0,0,0,0,0,0,0,0,0,
-						 0,0,0,0,0,0,0,0,0,
-						 0,0,0,0,0,0,5,0,0,
-						 0,0,0,0,8,0,0,0,0,
-						 0,0,0,0,0,0,0,0,0,
-						 0,0,0,0,0,0,0,5,0];
+		var initData;
+		initData  =[2,0,6,0,0,1,0,8,0,
+					1,7,0,0,0,9,0,6,0,
+					0,0,0,4,6,7,0,0,0,
+					6,1,0,0,4,0,8,0,0,
+					0,0,2,0,0,0,3,0,0,
+					0,0,5,0,7,0,0,9,6,
+					0,0,0,2,1,5,0,0,0,
+					0,3,0,6,0,0,0,2,8,
+					0,2,0,7,0,0,6,0,5];
+		return (function(){
+			return initData;
+		});
+	},
+	setData:function(index,num){
+		var currentData;
+		if (typeof(currentData) == 'undefined') {
+			currentData = this.generateInitData();
+		}
+		var tmp = currentData.split('');
+		tmp[index] = num;
+		currentData = tmp.join('');
+		return (function(){
+			return currentData;
+		})();
 	},
 	checkRepeat:function(){
 
