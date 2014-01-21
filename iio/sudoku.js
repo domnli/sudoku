@@ -3,7 +3,8 @@ sudoku = function(io){
 	var sideLength = 600;
 	var editMode = 0; // 0 插入模式  1  草稿模式
 	var currentCell = new iio.SimpleRect(0,0,sideLength/9).setStrokeStyle('#ff7e00',3); //当前编辑格
-
+	var currentData = sudokulogic.generateInitData();
+sudokulogic.printData(currentData);
 	//cal lt(left top)
 	ltx = io.canvas.center.x - sideLength / 2;
 	lty = io.canvas.center.y - sideLength / 2;
@@ -25,16 +26,17 @@ sudoku = function(io){
 	io.addObj(grid3.setStrokeStyle('black',3));
 
 	// HELP TEXT
-	var helpText1 = new iio.Text('Change Mode : Space',350,205)
+	var helpText1 = new iio.Text('Change Mode : Space',bg.pos.x - bg.width / 2 - 220,bg.pos.y)
 						    .setFont('20px Consolas')
 						    .setTextAlign('center')
 						    .setFillStyle('#00baff');
 	io.addObj(helpText1);
-	var helpText2 = new iio.Text('Clear : c (or CapS Lock + c)',400,245)
+	var helpText2 = new iio.Text('Clear : c (or CapS Lock + c)',bg.pos.x - bg.width / 2 - 170,bg.pos.y + 50)
 						    .setFont('20px Consolas')
 						    .setTextAlign('center')
 						    .setFillStyle('#00baff');
 	io.addObj(helpText2);
+
 	var drawNumber = function(num){
 		if (!currentCell.canEdit) {
 			return;
@@ -75,7 +77,8 @@ sudoku = function(io){
 
 		if(editMode == 0){
 			hideEditNum();
-			console.log(grid2.cells[coor.x][coor.y].numObj);
+			currentData = sudokulogic.setData(coor,num,currentData);
+			sudokulogic.printData(currentData);
 			if(typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined'){
 				grid2.cells[coor.x][coor.y].numObj.setText(num);
 				io.draw();
@@ -128,7 +131,6 @@ sudoku = function(io){
 			};
 			grid2.cells[coor.x][coor.y].editNumObj = undefined;
 		}
-		console.log(grid2);
 		io.draw();
 	};
 
@@ -145,11 +147,13 @@ sudoku = function(io){
 			io.rmvObj(grid2.cells[coor.x][coor.y].numObj);
 			grid2.cells[coor.x][coor.y].numObj = undefined;
 			io.draw();
+
+			currentData = sudokulogic.setData(coor,0,currentData);
+			sudokulogic.printData(currentData);
 		}
 		var loop = grid2.cells[coor.x][coor.y].forzen;
 		if (typeof(loop) != 'undefined') {
 			for (var i = 0; i < loop.length; i++) {
-				console.log(loop[i]);
 				drawNumber(loop[i]);
 			};
 			grid2.cells[coor.x][coor.y].forzen = undefined;
@@ -167,7 +171,7 @@ sudoku = function(io){
 	};
 	//draw init number
 	(function(){
-		var I = (sudokulogic.generateInitData())();
+		var I = currentData;
 		var grid2res = grid2.res.y;
 		var fontSize = Math.floor(grid2res * 0.8);
 		for(var i = 0 ; i < I.length ; i++){
@@ -192,7 +196,7 @@ sudoku = function(io){
 	})();
 
 	window.addEventListener('keydown',function(event){
-		console.log(iio.getKeyString(event));
+		//console.log(iio.getKeyString(event));
 	});
 	window.addEventListener('keypress',function(event){
 		if (iio.keyCodeIs('space',event)) {
@@ -244,26 +248,36 @@ sudokulogic = {
 					0,0,0,2,1,5,0,0,0,
 					0,3,0,6,0,0,0,2,8,
 					0,2,0,7,0,0,6,0,5];
-		return (function(){
-			return initData;
-		});
+		return initData;
 	},
-	setData:function(index,num){
-		var currentData;
-		if (typeof(currentData) == 'undefined') {
-			currentData = this.generateInitData();
+	setData:function(index,num,data){
+		if (typeof(index.x) != 'undefined') {
+			index = index.x + index.y * 9;
 		}
-		var tmp = currentData.split('');
-		tmp[index] = num;
-		currentData = tmp.join('');
-		return (function(){
-			return currentData;
-		})();
+		data[index] = num;
+		return data;
 	},
-	checkRepeat:function(){
-
+	printData:function(data){
+		console.log('---------------------------------');
+		for (var i= 0; i< data.length; i = i + 9) {
+			var out = '';
+			for (var j = 0; j < 9; j++) {
+				out += data[i+j] + '   ';
+			};
+			console.log(out + "\n");
+		};
 	},
-	checkWin:function(){
+	checkRepeat:function(data){
+		var repeatCoor = []; //[{x:0,y:0},{x:1,y:1}];
+		//行检查
+		for (var i = 0; i < Things.length; i++) {
+			Things[i]
+		};
+		//列检查
+		//宫检查
+		return repeatCoor;
+	},
+	checkWin:function(data){
 
 	}
 };
