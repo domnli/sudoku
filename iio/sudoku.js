@@ -62,13 +62,18 @@ sudoku = function(io){
 			var loop = grid2.cells[coor.x][coor.y].editNumObj;
 			if(typeof(loop) != 'undefined'){
 				for (var i = 0; i < loop.length; i++) {
-					loop[i].setFillStyle('#FFFFFF');
+					if(typeof(loop[i]) != 'undefined'){
+						io.rmvObj(loop[i]);
+						loop[i] = undefined;
+						//loop[i].setFillStyle('#FFFFFF');
+					}
 				};
 			}
 			io.draw();
 		}
 		if(editMode == 0){
 			hideEditNum();
+			console.log(grid2.cells[coor.x][coor.y].numObj);
 			if(typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined'){
 				grid2.cells[coor.x][coor.y].numObj.setText(num);
 				io.draw();
