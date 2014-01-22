@@ -270,10 +270,27 @@ sudokulogic = {
 	},
 	checkRepeat: function(data) {
 		var repeatCoor = []; //[{x:0,y:0},{x:1,y:1}];
-		//行检查
-		for (var i = 0; i < Things.length; i++) {
-			Things[i]
+		var row = [],column = [],palace = [],palacePos = [0,3,6,27,30,33,54,57,60];
+		for (var i = 0; i < 9; i++) {
+			row.push(data.slice(i * 9, i * 9 +9));
+			column[i] = [];
+			for (var j = 0; j < 9; j++) {
+				column[i].push(data[j*9+i]);
+			};
+			palace[i] = [
+							data[palacePos[i]],
+							data[palacePos[i] + 1],
+							data[palacePos[i] + 2],
+							data[palacePos[i] + 9],
+							data[palacePos[i] + 10],
+							data[palacePos[i] + 11],
+							data[palacePos[i] + 18],
+							data[palacePos[i] + 19],
+							data[palacePos[i] + 20],
+						];
 		};
+		
+		//行检查
 		//列检查
 		//宫检查
 		return repeatCoor;
