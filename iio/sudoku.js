@@ -78,7 +78,7 @@ var sudoku = function (io) {
 		if (editMode == 0) {
 			hideEditNum();
 			currentData = sudokulogic.setData(coor, num, currentData);
-			sudokulogic.printData(currentData);
+			sudokulogic.checkRepeat(currentData);
 			if (typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined') {
 				grid2.cells[coor.x][coor.y].numObj.setText(num);
 				io.draw();
@@ -149,7 +149,7 @@ var sudoku = function (io) {
 			io.draw();
 
 			currentData = sudokulogic.setData(coor, 0, currentData);
-			sudokulogic.printData(currentData);
+			sudokulogic.checkRepeat(currentData);
 		}
 		var loop = grid2.cells[coor.x][coor.y].forzen;
 		if (typeof(loop) != 'undefined') {
@@ -239,7 +239,8 @@ sudokulogic = {
 	level: 0,
 	generateInitData: function() {
 		var initData;
-		initData = [2, 0, 6, 0, 0, 1, 0, 8, 0,
+		initData = [
+					2, 0, 6, 0, 0, 1, 0, 8, 0,
 					1, 7, 0, 0, 0, 9, 0, 6, 0,
 					0, 0, 0, 4, 6, 7, 0, 0, 0,
 					6, 1, 0, 0, 4, 0, 8, 0, 0,
@@ -255,7 +256,7 @@ sudokulogic = {
 		if (typeof(index.x) != 'undefined') {
 			index = index.x + index.y * 9;
 		}
-		data[index] = num;
+		data[index] = parseInt(num);
 		return data;
 	},
 	printData: function(data) {
@@ -270,27 +271,62 @@ sudokulogic = {
 	},
 	checkRepeat: function(data) {
 		var repeatCoor = []; //[{x:0,y:0},{x:1,y:1}];
+		var tagData = data.slice();
 		var row = [],column = [],palace = [],palacePos = [0,3,6,27,30,33,54,57,60];
+		var cusPush = function (target, elm) {
+			if(target.length == 0){
+				target.push(elm);
+				return;
+			}
+			var push = true;
+			for (var i = 0; i < target.length; i++) {
+				if ( typeof(elm.x) != 'undefined' && typeof(elm.y) != 'undefined' ){
+					if(elm.x == target[i].x && elm.y == target[i].y){
+						push = false;
+					}
+				}
+			}
+			if(push){
+				target.push(elm);
+			}
+		};
 		for (var i = 0; i < 9; i++) {
-			row.push(data.slice(i * 9, i * 9 +9));
+			row.push(tagData.slice(i * 9, i * 9 +9));
 			column[i] = [];
 			for (var j = 0; j < 9; j++) {
-				column[i].push(data[j*9+i]);
+				column[i].push(tagData[j*9+i]);
 			};
 			palace[i] = [
-							data[palacePos[i]],
-							data[palacePos[i] + 1],
-							data[palacePos[i] + 2],
-							data[palacePos[i] + 9],
-							data[palacePos[i] + 10],
-							data[palacePos[i] + 11],
-							data[palacePos[i] + 18],
-							data[palacePos[i] + 19],
-							data[palacePos[i] + 20],
+							tagData[palacePos[i]],
+							tagData[palacePos[i] + 1],
+							tagData[palacePos[i] + 2],
+							tagData[palacePos[i] + 9],
+							tagData[palacePos[i] + 10],
+							tagData[palacePos[i] + 11],
+							tagData[palacePos[i] + 18],
+							tagData[palacePos[i] + 19],
+							tagData[palacePos[i] + 20],
 						];
 		};
-		
+		console.log(row);
+		console.log(column);
+		console.log(palace);
 		//行检查
+		for (var ry = 0; ry < 9; ry++) {
+			var panlRow = [];
+			for (var rx = 0; rx < 9; rx++) {
+				if (row[ry][rx] == 0){
+					continue;
+				}
+				if ( typeof(panlRow[row[ry][rx]]) == 'undefined' ) {
+					panlRow[row[ry][rx]]= {x:rx,y:ry};
+				}else{
+					cusPush(repeatCoor,{x:rx,y:ry});
+					cusPush(repeatCoor,panlRow[row[ry][rx]]);
+				}
+			};
+		};
+		console.log(repeatCoor);
 		//列检查
 		//宫检查
 		return repeatCoor;
