@@ -319,16 +319,46 @@ sudokulogic = {
 					continue;
 				}
 				if ( typeof(panlRow[row[ry][rx]]) == 'undefined' ) {
-					panlRow[row[ry][rx]]= {x:rx,y:ry};
+					panlRow[row[ry][rx]] = {x:rx,y:ry};
 				}else{
 					cusPush(repeatCoor,{x:rx,y:ry});
 					cusPush(repeatCoor,panlRow[row[ry][rx]]);
 				}
 			};
 		};
-		console.log(repeatCoor);
 		//列检查
-		//宫检查
+		for (var cx = 0; cx < 9; cx++) {
+			var panlColumn = [];
+			for (var cy = 0; cy < 9; cy++) {
+				if (column[cx][cy] == 0){
+					continue;
+				}
+				if ( typeof(panlColumn[column[cx][cy]]) == 'undefined' ) {
+					panlColumn[column[cx][cy]] = {x:cx,y:cy};
+				}else{
+					cusPush(repeatCoor,{x:cx,y:cy});
+					cusPush(repeatCoor,panlColumn[column[cx][cy]]);
+				}
+			};
+		};
+		//宫检查  bug repairing
+		for (var p = 0; p < 9; p++) {
+			var panlPalace = [],offset = [0, 1, 2, 9, 10, 11, 18, 19, 20];
+			for (var q = 0; q < 9; q++) {
+				if(palace[p][q] == 0){
+					continue;
+				}
+				var px = ( p + offset[q] ) % 9,
+					py = Math.floor( ( p + offset[q] ) / 9 );
+				if( typeof(panlPalace[palace[p][q]]) == 'undefined' ) {
+					panlPalace[palace[p][q]] = {x:px,y:py};
+				}else{
+					cusPush(repeatCoor,{x:px,y:py});
+					cusPush(repeatCoor,panlPalace[palace[p][q]]);
+				}
+			};
+		};
+		console.log(repeatCoor);
 		return repeatCoor;
 	},
 	checkWin: function(data) {
