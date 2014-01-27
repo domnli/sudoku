@@ -341,15 +341,15 @@ sudokulogic = {
 				}
 			};
 		};
-		//宫检查  bug repairing
+		//宫检查
 		for (var p = 0; p < 9; p++) {
 			var panlPalace = [],offset = [0, 1, 2, 9, 10, 11, 18, 19, 20];
 			for (var q = 0; q < 9; q++) {
 				if(palace[p][q] == 0){
 					continue;
 				}
-				var px = ( p + offset[q] ) % 9,
-					py = Math.floor( ( p + offset[q] ) / 9 );
+				var px = ( palacePos[p] + offset[q] ) % 9,
+					py = Math.floor( ( palacePos[p] + offset[q] ) / 9 );
 				if( typeof(panlPalace[palace[p][q]]) == 'undefined' ) {
 					panlPalace[palace[p][q]] = {x:px,y:py};
 				}else{
