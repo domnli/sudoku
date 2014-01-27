@@ -77,8 +77,6 @@ var sudoku = function (io) {
 
 		if (editMode == 0) {
 			hideEditNum();
-			currentData = sudokulogic.setData(coor, num, currentData);
-			sudokulogic.checkRepeat(currentData);
 			if (typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined') {
 				grid2.cells[coor.x][coor.y].numObj.setText(num);
 				io.draw();
@@ -89,6 +87,8 @@ var sudoku = function (io) {
 					.setFillStyle('#000000');
 				io.addObj(grid2.cells[coor.x][coor.y].numObj);
 			}
+			currentData = sudokulogic.setData(coor, num, currentData);
+			checkWin(currentData);
 		} else {
 			if (typeof(grid2.cells[coor.x][coor.y].numObj) != 'undefined') {
 				return;
@@ -149,7 +149,7 @@ var sudoku = function (io) {
 			io.draw();
 
 			currentData = sudokulogic.setData(coor, 0, currentData);
-			sudokulogic.checkRepeat(currentData);
+			checkWin(currentData);
 		}
 		var loop = grid2.cells[coor.x][coor.y].forzen;
 		if (typeof(loop) != 'undefined') {
@@ -158,6 +158,7 @@ var sudoku = function (io) {
 			};
 			grid2.cells[coor.x][coor.y].forzen = undefined;
 		}
+		editMode = 0;
 	};
 
 	var changeEditPos = function(pos) {
@@ -167,6 +168,25 @@ var sudoku = function (io) {
 			io.addObj(currentCell);
 		}
 		currentCell.setPos(pos.x, pos.y);
+		io.draw();
+	};
+
+	var checkWin = function(currentData){
+		var repeats = sudokulogic.checkRepeat(currentData);
+		for (var i = 0; i < grid2.cells.length; i++) {
+			for (var j = 0; j < grid2.cells[i].length; j++) {
+				if (typeof(grid2.cells[i][j].numObj) != 'undefined') {
+					grid2.cells[i][j].numObj.setFillStyle('#000000');
+				}
+			};
+		};
+		if (repeats.length > 0) {
+			for (var i = 0; i < repeats.length; i++) {
+				grid2.cells[repeats[i]['x']][repeats[i]['y']].numObj.setFillStyle('red');
+			};
+		} else {
+			//win
+		}
 		io.draw();
 	};
 	//draw init number
@@ -186,10 +206,11 @@ var sudoku = function (io) {
 					.setFillStyle('silver'));
 				//number
 				pos.y = pos.y + Math.floor(grid2res * 0.2);
-				io.addObj(new iio.Text(I[i], pos)
-					.setFont(fontSize + 'px Consolas')
-					.setTextAlign('center')
-					.setFillStyle('#000000'));
+				grid2.cells[x][y].numObj = new iio.Text(I[i], pos)
+												.setFont(fontSize + 'px Consolas')
+												.setTextAlign('center')
+												.setFillStyle('#000000');
+				io.addObj(grid2.cells[x][y].numObj);
 
 			}
 		}
@@ -308,9 +329,9 @@ sudokulogic = {
 							tagData[palacePos[i] + 20],
 						];
 		};
-		console.log(row);
-		console.log(column);
-		console.log(palace);
+		//console.log(row);
+		//console.log(column);
+		//console.log(palace);
 		//行检查
 		for (var ry = 0; ry < 9; ry++) {
 			var panlRow = [];
@@ -358,10 +379,15 @@ sudokulogic = {
 				}
 			};
 		};
-		console.log(repeatCoor);
+		//console.log(repeatCoor);
 		return repeatCoor;
 	},
 	checkWin: function(data) {
-
+		var repeats = this.checkRepeat(data);
+		if (repeats.length > 0) {
+			return false;
+		}else{
+			return true;
+		}
 	}
 };
