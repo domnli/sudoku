@@ -31,7 +31,7 @@ var sudoku = function (io) {
 		.setTextAlign('center')
 		.setFillStyle('#00baff');
 	io.addObj(helpText1);
-	var helpText2 = new iio.Text('Clear : c (or CapS Lock + c)', bg.pos.x - bg.width / 2 - 170, bg.pos.y + 50)
+	var helpText2 = new iio.Text('Clear : C or c', bg.pos.x - bg.width / 2 - 170, bg.pos.y + 50)
 		.setFont('20px Consolas')
 		.setTextAlign('center')
 		.setFillStyle('#00baff');
