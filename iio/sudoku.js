@@ -31,7 +31,7 @@ var sudoku = function (io) {
 		.setTextAlign('center')
 		.setFillStyle('#00baff');
 	io.addObj(helpText1);
-	var helpText2 = new iio.Text('Clear : C or c', bg.pos.x - bg.width / 2 - 170, bg.pos.y + 50)
+	var helpText2 = new iio.Text('Clear : C or c', bg.pos.x - bg.width / 2 - 247, bg.pos.y + 50)
 		.setFont('20px Consolas')
 		.setTextAlign('center')
 		.setFillStyle('#00baff');
@@ -181,11 +181,23 @@ var sudoku = function (io) {
 			};
 		};
 		if (repeats.length > 0) {
+			if (repeats[0] == 'error') {
+				sudokulogic.error('数据错误,将重置..');
+			}
 			for (var i = 0; i < repeats.length; i++) {
 				grid2.cells[repeats[i]['x']][repeats[i]['y']].numObj.setFillStyle('red');
 			};
 		} else {
-			//win
+			var finished = true;
+			for (var fin = 0; fin < currentData.length; fin++) {
+				if (currentData[fin] == 0) {
+					finished = false;
+					break;
+				}
+			};
+			if (finished) {
+				sudokulogic.win();
+			}
 		}
 		io.draw();
 	};
@@ -257,20 +269,95 @@ var sudoku = function (io) {
 };
 sudokulogic = {
 	redPos: [],
-	level: 0,
-	generateInitData: function() {
-		var initData;
-		initData = [
-					2, 0, 6, 0, 0, 1, 0, 8, 0,
-					1, 7, 0, 0, 0, 9, 0, 6, 0,
-					0, 0, 0, 4, 6, 7, 0, 0, 0,
-					6, 1, 0, 0, 4, 0, 8, 0, 0,
-					0, 0, 2, 0, 0, 0, 3, 0, 0,
-					0, 0, 5, 0, 7, 0, 0, 9, 6,
-					0, 0, 0, 2, 1, 5, 0, 0, 0,
-					0, 3, 0, 6, 0, 0, 0, 2, 8,
-					0, 2, 0, 7, 0, 0, 6, 0, 5
+	level: 0,  //  0 easy  1 normal   2 hard  3 impossible
+	getLocalSeed : function() {
+        if (typeof window.localStorage != 'undefined') {
+        	if (typeof window.localStorage.sudoku != 'undefined' 
+        		&& typeof window.localStorage.sudoku.seed != 'undefined') {
+        		if (this.checkRepeat(window.localStorage.sudoku.seed).length == 0) {
+        			return window.localStorage.sudoku.seed;
+        		}
+        	}
+        }
+        return [
+					9, 7, 8, 3, 1, 2, 6, 4, 5,
+					3, 1, 2, 6, 4, 5, 9, 7, 8,
+					6, 4, 5, 9, 7, 8, 3, 1, 2,
+					7, 8, 9, 1, 2, 3, 4, 5, 6,
+					1, 2, 3, 4, 5, 6, 7, 8, 9,
+					4, 5, 6, 7, 8, 9, 1, 2, 3,
+					8, 9, 7, 2, 3, 1, 5, 6, 4,
+					2, 3, 1, 5, 6, 4, 8, 9, 7,
+					5, 6, 4, 8, 9, 7, 2, 3, 1
 				];
+	},
+	setLocalSeed : function(data) {
+        if (typeof window.localStorage != 'undefined') {
+        	window.localStorage.sudoku= {seed:data};
+        }
+	},
+	generateInitData: function() {
+		var initData, virus = [], cache = [0, 0, 0, 0, 0, 0, 0, 0, 0], times = 0, dig;
+		switch(this.level){
+			case 1:
+			    dig = Math.floor(Math.random() * 3 + 51);
+			    break;
+			case 2:
+			    dig = Math.floor(Math.random() * 3 + 53);
+			    break;
+			case 3:
+			    dig = Math.floor(Math.random() * 3 + 56);
+			    break;
+			default:
+			    dig = Math.floor(Math.random()*3 + 45);
+			    break;
+		}
+		initData = this.getLocalSeed();
+
+		while (true) {
+            var num = Math.floor(Math.random()*9 + 1);
+            if (cache[num - 1] == 0) {
+            	cache[num - 1] = num;
+            	virus.push(num);
+            	times++;
+            }
+            if(times == 9){
+            	break;
+            }
+		}
+        
+        for (var i = 0; i < initData.length; i++) {
+			initData[i] = virus[initData[i] - 1];
+		};
+
+        this.setLocalSeed(initData);
+
+        for (var tmp = 0; tmp < virus.length; tmp++) {
+        	if (virus[tmp] < 9) {
+        		virus[tmp]++;
+        	}else{
+        		virus[tmp] = 1;
+        	}
+        };
+
+		for (var i = 0; i < initData.length; i++) {
+			initData[i] = virus[initData[i] - 1];
+		};
+        
+        for (var d = 0; d < dig; d++) {
+        	
+        };
+        while(true){
+        	var hole = Math.floor(Math.random()*81);
+        	if(initData[hole] != 0){
+        		initData[hole] = 0;
+        		dig--;
+        	}
+        	if(dig == 0){
+        		break;
+        	}
+        }
+		this.data = initData;
 		return initData;
 	},
 	setData: function(index, num, data) {
@@ -281,6 +368,9 @@ sudokulogic = {
 		return data;
 	},
 	printData: function(data) {
+		if (typeof console == 'undefined'){
+			return false;
+		}
 		console.log('---------------------------------');
 		for (var i = 0; i < data.length; i = i + 9) {
 			var out = '';
@@ -291,6 +381,15 @@ sudokulogic = {
 		};
 	},
 	checkRepeat: function(data) {
+		if (typeof data == 'undefined') {
+			return ['error'];
+		}
+		if (Object.prototype.toString.call(data) != '[object Array]') {
+			return ['error'];
+		}
+		if (data.length != 81) {
+			return ['error'];
+		}
 		var repeatCoor = []; //[{x:0,y:0},{x:1,y:1}];
 		var tagData = data.slice();
 		var row = [],column = [],palace = [],palacePos = [0,3,6,27,30,33,54,57,60];
@@ -389,5 +488,13 @@ sudokulogic = {
 		}else{
 			return true;
 		}
-	}
+	},
+    win : function(){
+    	alert('win');
+    	window.location.reload();
+    },
+    error : function(msg){
+        alert(msg);
+        window.location.reload();
+    }
 };
