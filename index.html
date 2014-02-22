@@ -13,6 +13,9 @@
 			script = 'iio/sudoku.js';
 		}
 		KISSY.getScript(script,{success:function(){
+			var level = prompt('难度选择 0:easy 1:normal 2:hard 3:impossible',0);
+			level = isNaN(parseInt(level)) ? 0 : parseInt(level);
+			sudokulogic.level = level;
 			iio.start(sudoku);
 		}});	
 	}});
@@ -25,5 +28,6 @@
 	</script>
 </head>
 <body>
+<div style = 'display:none;text-align:center;width:500px;height:300px'>难度选择</div>
 </body>
 </html>
