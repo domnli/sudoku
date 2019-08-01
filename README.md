@@ -1,3 +1,5 @@
 # sudoku
+
 sudoku by iioEngine
-demo(http://domnli.github.io/sudoku/)
+
+[demo](http://domnli.github.io/sudoku/)
